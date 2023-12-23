@@ -13,6 +13,7 @@ window.onload = function () {
 		const videoUrl = window.URL.createObjectURL(videoBlob);
 		document.getElementsByTagName('video')[0].src = videoUrl;
 
+		console.log({ chunks });
 		chunks = [];
 	};
 
@@ -55,9 +56,5 @@ window.onload = function () {
 			recordButton.style.color = 'black';
 			recordButton.innerText = 'Record';
 		}
-	};
-
-	document.getElementsByTagName('video')[0].onclick = () => {
-		console.log({ chunks });
 	};
 };
