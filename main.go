@@ -16,21 +16,31 @@ func main() {
 
 func handlers() *mux.Router {
 	router := mux.NewRouter()
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("")))
 	router.HandleFunc("/", index).Methods("GET")
-	// router.HandleFunc("/save", saveWebmToLocalFile).Methods("POST")
+	router.HandleFunc("/save", saveWebmToLocalFile).Methods("POST")
 
 	return router
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("INDEX")
-	wd, err := os.Getwd()
+	entries, err := os.ReadDir("C:\\Users\\spyro\\Apps\\streamy")
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(wd)
-	fmt.Println("INDEX4")
-	http.ServeFile(w, r, "index.html")
+
+	for _, entry := range entries {
+		fmt.Println(entry.Name())
+	}
+
+	// filepath.Walk("/", func(path string, info os.FileInfo, err error) error {
+	// 	fmt.Println(path)
+	// 	return nil
+	// })
+
+	// http.ServeFile(w, r, "C:\\Users\\spyro\\Apps\\streamy")
+	http.FileServer(http.Dir("C:\\Users\\spyro\\Apps\\streamy"))
 }
 
 func saveWebmToLocalFile(w http.ResponseWriter, r *http.Request) {
