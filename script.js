@@ -3,7 +3,7 @@ window.onload = function () {
 	let mediaRecorder;
 	let recording = false;
 
-	const onStop = () => {
+	const onStop = async () => {
 		const audioBlob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
 		const audioUrl = window.URL.createObjectURL(audioBlob);
 		document.getElementsByTagName('audio')[0].src = audioUrl;
@@ -13,7 +13,11 @@ window.onload = function () {
 		const videoUrl = window.URL.createObjectURL(videoBlob);
 		document.getElementsByTagName('video')[0].src = videoUrl;
 
-		console.log({ chunks });
+        console.log('save')
+		await fetch('/save', {
+			method: 'POST',
+			body: chunks,
+		});
 		chunks = [];
 	};
 
@@ -56,5 +60,9 @@ window.onload = function () {
 			recordButton.style.color = 'black';
 			recordButton.innerText = 'Record';
 		}
+	};
+
+	document.getElementsByTagName('video')[0].onclick = () => {
+		console.log({ chunks });
 	};
 };
