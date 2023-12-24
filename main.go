@@ -4,25 +4,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-
-	"github.com/gorilla/mux"
+	"os"
 )
 
 func main() {
-	http.Handle("/", handlers())
+	http.Handle("/", http.FileServer(http.Dir("./static")))
+	http.HandleFunc("/save", saveWebmToLocalFile)
 	http.ListenAndServe(":8000", nil)
-}
-
-func handlers() *mux.Router {
-	router := mux.NewRouter()
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("")))
-	router.HandleFunc("/save", saveWebmToLocalFile).Methods("POST")
-
-	return router
-}
-
-func index(w http.ResponseWriter, r *http.Request) {
-	http.FileServer(http.Dir("C:\\Users\\spyro\\Apps\\streamy"))
 }
 
 func saveWebmToLocalFile(w http.ResponseWriter, r *http.Request) {
@@ -30,5 +18,6 @@ func saveWebmToLocalFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Printf("could not read request body")
 	}
+	os.WriteFile("test.webm", body, 0600)
 	fmt.Println(body)
 }
