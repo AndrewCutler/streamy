@@ -4,6 +4,9 @@ window.onload = function () {
 	let recording = false;
 	let videoUrl;
 
+	function getVideoElement() {
+		return document.getElementsByTagName('video')[0];
+	}
 	function download(path, filename) {
 		const anchor = document.createElement('a');
 		anchor.href = path;
@@ -22,9 +25,8 @@ window.onload = function () {
 		// includes audio
 		const videoBlob = new Blob(chunks, { type: 'video/webm' });
 		videoUrl = window.URL.createObjectURL(videoBlob);
-		document.getElementsByTagName('video')[0].src = videoUrl;
+		getVideoElement().src = videoUrl;
 
-		console.log('save');
 		const formData = new FormData();
 		formData.append('content', videoBlob);
 		// await fetch('save', {
@@ -40,14 +42,22 @@ window.onload = function () {
 		try {
 			stream = await navigator.mediaDevices.getUserMedia({
 				video: true,
-				audio: true,
+				// audio: true,
 			});
 			mediaRecorder = new MediaRecorder(stream);
+			// save data to chunks
 			mediaRecorder.ondataavailable = (e) => {
 				console.log(e);
 				chunks.push(e.data);
 			};
 			mediaRecorder.onstop = onStop;
+
+			// stream cam to video element
+			const videoElement = getVideoElement();
+			videoElement.srcObject = stream;
+			videoElement.onloadedmetadata = (e) => {
+				videoElement.play();
+			};
 		} catch (err) {
 			console.error(err);
 		}
@@ -81,7 +91,7 @@ window.onload = function () {
 		window.URL.revokeObjectURL(videoUrl);
 	};
 
-	document.getElementsByTagName('video')[0].onclick = () => {
-		console.log({ chunks });
-	};
+	// document.getElementsByTagName('video')[0].onclick = () => {
+	// 	console.log({ chunks });
+	// };
 };
