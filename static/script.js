@@ -23,6 +23,9 @@ window.onload = function () {
 			await fetch('save', {
 				method: 'POST',
 				body: formData,
+				headers: {
+					'Content-Type': undefined,
+				},
 			});
 
 			chunks = [];
