@@ -7,29 +7,28 @@ window.onload = function () {
 	function createMediaRecorder(stream) {
 		const _mediaRecorder = new MediaRecorder(stream);
 
-        // save data to chunks
-        _mediaRecorder.ondataavailable = (e) => {
-            // console.log(e);
-            chunks.push(e.data);
-        };
+		// save data to chunks
+		_mediaRecorder.ondataavailable = function ({ data }) {
+			// console.log(e);
+			chunks.push(data);
+		};
 
-        _mediaRecorder.onstop = async () => {
-            // includes audio
-            const videoBlob = new Blob(chunks, { type: 'video/webm' });
-            videoUrl = window.URL.createObjectURL(videoBlob);
-            getVideoElement().src = videoUrl;
+		_mediaRecorder.onstop = async function () {
+			const videoBlob = new Blob(chunks, { type: 'video/webm' });
+			videoUrl = window.URL.createObjectURL(videoBlob);
+			getVideoElement().src = videoUrl;
 
-            const formData = new FormData();
-            formData.append('content', videoBlob);
-            await fetch('save', {
-                method: 'POST',
-                body: formData,
-            });
-            
-            chunks = [];
-        };
+			const formData = new FormData();
+			formData.append('content', videoBlob);
+			await fetch('save', {
+				method: 'POST',
+				body: formData,
+			});
 
-        return _mediaRecorder;
+			chunks = [];
+		};
+
+		return _mediaRecorder;
 	}
 
 	function getVideoElement() {
@@ -54,7 +53,7 @@ window.onload = function () {
 				video: true,
 			});
 
-            mediaRecorder = createMediaRecorder(stream);
+			mediaRecorder = createMediaRecorder(stream);
 			// stream cam to video element
 			const videoElement = getVideoElement();
 			videoElement.srcObject = stream;
@@ -67,12 +66,12 @@ window.onload = function () {
 	}
 
 	const getAccessButton = document.getElementById('get-access');
-	getAccessButton.onclick = () => {
+	getAccessButton.onclick = function () {
 		getMedia();
 	};
 
 	const recordButton = document.getElementById('record');
-	recordButton.onclick = () => {
+	recordButton.onclick = function () {
 		recording = !recording;
 		console.log('recording: ', recording);
 		if (recording) {
@@ -89,7 +88,7 @@ window.onload = function () {
 	};
 
 	const downloadButton = document.getElementById('download');
-	downloadButton.onclick = () => {
+	downloadButton.onclick = function () {
 		download(videoUrl, 'test.webm');
 		window.URL.revokeObjectURL(videoUrl);
 	};
