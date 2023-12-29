@@ -18,10 +18,6 @@ window.onload = function () {
 	}
 
 	const onStop = async () => {
-		// const audioBlob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
-		// const audioUrl = window.URL.createObjectURL(audioBlob);
-		// document.getElementsByTagName('audio')[0].src = audioUrl;
-
 		// includes audio
 		const videoBlob = new Blob(chunks, { type: 'video/webm' });
 		videoUrl = window.URL.createObjectURL(videoBlob);
@@ -90,8 +86,4 @@ window.onload = function () {
 		download(videoUrl, 'test.webm');
 		window.URL.revokeObjectURL(videoUrl);
 	};
-
-	// document.getElementsByTagName('video')[0].onclick = () => {
-	// 	console.log({ chunks });
-	// };
 };
