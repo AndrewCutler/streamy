@@ -4,9 +4,38 @@ window.onload = function () {
 	let recording = false;
 	let videoUrl;
 
+	function createMediaRecorder(stream) {
+		const _mediaRecorder = new MediaRecorder(stream);
+
+        // save data to chunks
+        _mediaRecorder.ondataavailable = (e) => {
+            // console.log(e);
+            chunks.push(e.data);
+        };
+
+        _mediaRecorder.onstop = async () => {
+            // includes audio
+            const videoBlob = new Blob(chunks, { type: 'video/webm' });
+            videoUrl = window.URL.createObjectURL(videoBlob);
+            getVideoElement().src = videoUrl;
+
+            const formData = new FormData();
+            formData.append('content', videoBlob);
+            await fetch('save', {
+                method: 'POST',
+                body: formData,
+            });
+            
+            chunks = [];
+        };
+
+        return _mediaRecorder;
+	}
+
 	function getVideoElement() {
 		return document.getElementsByTagName('video')[0];
 	}
+
 	function download(path, filename) {
 		const anchor = document.createElement('a');
 		anchor.href = path;
@@ -17,37 +46,15 @@ window.onload = function () {
 		document.body.removeChild(anchor);
 	}
 
-	const onStop = async () => {
-		// includes audio
-		const videoBlob = new Blob(chunks, { type: 'video/webm' });
-		videoUrl = window.URL.createObjectURL(videoBlob);
-		getVideoElement().src = videoUrl;
-
-		const formData = new FormData();
-		formData.append('content', videoBlob);
-		// await fetch('save', {
-		// 	method: 'POST',
-		// 	body: formData,
-		// });
-		chunks = [];
-	};
-
 	async function getMedia() {
 		let stream;
 
 		try {
 			stream = await navigator.mediaDevices.getUserMedia({
 				video: true,
-				// audio: true,
 			});
-			mediaRecorder = new MediaRecorder(stream);
-			// save data to chunks
-			mediaRecorder.ondataavailable = (e) => {
-				console.log(e);
-				chunks.push(e.data);
-			};
-			mediaRecorder.onstop = onStop;
 
+            mediaRecorder = createMediaRecorder(stream);
 			// stream cam to video element
 			const videoElement = getVideoElement();
 			videoElement.srcObject = stream;
